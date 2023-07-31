@@ -155,5 +155,10 @@ def update_song(song_id):
 def delete_song(song_id):
     existing_song = db.songs.find_one({"id": song_id})
     if existing_song:
-        deleteTheSong = db.songs.delete_one()
-
+        deleteTheSong = db.songs.delete_one({"id": song_id})
+        if deleteTheSong.deleted_count > 0:
+            return "", 204
+        elif deleteTheSong.deleted_count == 0:
+            return {"message": "song not found"}
+    else:
+        return {"Erorr":"song not found"}
