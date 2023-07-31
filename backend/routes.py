@@ -129,3 +129,16 @@ def create_song(song_id):
 
     # Return a success response with the inserted ID
     return jsonify({"inserted id": str(inserted_id)}), 201
+
+
+
+@app.route('song/<int:id>', methods=['PUT'])
+def update_song(song_id):
+    getTheSong = db.songs.find_one({"id":song_id})
+
+    if getTheSong == None:
+        return {"message": "song not found"}
+
+    
+    db.songs.update_one()
+        
