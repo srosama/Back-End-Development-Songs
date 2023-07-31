@@ -63,10 +63,9 @@ def health():
 
 @app.route("/count")
 def count():
-    if songs_list:
-        return jsonify(length=len(songs_list)), 200
+    count = db.songs.count_documents({})
 
-    return {"message": "Internal server error"}, 500
+    return {"count": count}, 200
 
 @app.route("/song")
 def songs():
