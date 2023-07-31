@@ -51,3 +51,81 @@ def parse_json(data):
 ######################################################################
 # INSERT CODE HERE
 ######################################################################
+
+
+@app.route("/health", methods=["GET"])
+def health():
+    for _ in songs_list:      
+        ...
+        return {"status":"OK"}
+
+
+
+@app.route("/count")
+def count():
+    if songs_list:
+        return jsonify(length=len(songs_list)), 200
+
+    return {"message": "Internal server error"}, 500
+
+@app.route("/song")
+def songs():
+    collection = db["songs"]
+    all_songs = collection.find({})
+
+    songs_list = []
+    for song in all_songs:
+        # Convert the ObjectId to a string for serialization
+        song["_id"] = str(song["_id"])
+        songs_list.append(song)
+
+    output = {"songs": songs_list}
+
+    return jsonify(output)
+
+
+@app.route('/song/<int:song_id>')
+def get_song_by_id(song_id):
+    findTheSong = db.songs.find_one({"id": song_id})
+    if findTheSong is None:
+        return {"message": "Song with the given ID not found"}, 404
+
+    # Convert the ObjectId to a string for serialization
+    findTheSong["_id"] = str(findTheSong["_id"])
+
+    # Return the song as a JSON response
+    return jsonify(findTheSong)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@app.route("/song/<int:song_id>", methods=["POST"])
+def create_song(song_id):
+    # Check if a song with the given ID already exists
+    findTheSong = db.songs.find_one({"id": song_id})
+    if findTheSong:
+        return jsonify({"Message": f"Song with id {song_id} already present"}), 302
+
+    # Get the song data from the request body
+    song_data = request.json
+    if not song_data or "lyrics" not in song_data or "title" not in song_data:
+        return jsonify({"Message": "Invalid song data"}), 400
+
+    # Append the song data to the data list and insert it into the database
+    song_data["id"] = song_id
+    inserted_id = db.songs.insert_one(song_data)
+
+    # Return a success response with the inserted ID
+    return jsonify({"inserted id": str(inserted_id)}), 201
